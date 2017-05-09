@@ -188,3 +188,147 @@ Such a script could look like this
 ```
 
 For more on [api-gateway](https://aws.amazon.com/api-gateway/)!
+
+#### cloudformation
+
+`Cloudformation` is awesome if you know how to use it. The documentation can be a little challenging at times when it comes to defining and linking resources
+ (resources are the tools you will create, i.e. Lambda functions, SQS queues, SNS events, ECS containers, IAM roles, etc.).
+ In short, what `cloudformation` allows you to do is create a stack of resources for any given project and even link resources from various
+ projects together (although this feature is a little more complex and I won't cover it in this tutorial). Having this stack is useful in management terms,
+ as it allows you do safely create, alter and delete all of or individual resources all in one place. This speeds up dev time dramatically once 
+ you master the configuration file.
+ `Cloudformation` requires that you use s3 to store your lambda code in a bucket. It will use it to fetch the code and load it into `lambda`.
+ Breath easily though. It's not as complicated as I make it sound :)
+ 
+ Take this file as an example:
+ 
+ ```javascript
+    {
+      "AWSTemplateFormatVersion": "2010-09-09",
+      "Description": "YOUR_API_DESCRIPTION",
+      "Parameters": {
+        "s3BucketName": {
+          "Type": "String",
+          "Description": "The S3 bucket in which the lambda function code is stored. Bucket names are region-unique, so you must change this."
+        },
+        "LambdaFunctionS3Key": {
+          "Type": "String",
+          "AllowedPattern": ".*\\.zip",
+          "Description": "The S3 object for the lambda function code package.",
+          "Default": "lambda-function.zip"
+        },
+        "ApiGatewaySwaggerS3Key": {
+          "Type": "String",
+          "AllowedPattern": ".*\\.yaml",
+          "Description": "The S3 object for the swagger definition of the API Gateway API.",
+          "Default": "simple-proxy-api.yaml"
+        }
+      },
+    
+      "Resources": {
+        "ApiGatewayApi": {
+          "Type": "AWS::ApiGateway::RestApi",
+          "Properties": {
+            "Description": "YOUR_API_DESCRIPTION",
+            "BodyS3Location": {
+              "Bucket": {
+                "Ref": "s3BucketName"
+              },
+              "Key": {
+                "Ref": "ApiGatewaySwaggerS3Key"
+              }
+            }
+          }
+        },
+    
+        "ApiGatewayApiDeployment": {
+          "Type": "AWS::ApiGateway::Deployment",
+          "Properties": {
+            "RestApiId": {
+              "Ref": "ApiGatewayApi"
+            },
+            "StageName": "YOUR_API_GATEWAY_STAGE"
+          }
+        },
+    
+        "LambdaApiGatewayExecutionPermission": {
+          "Type": "AWS::Lambda::Permission",
+          "Properties": {
+            "Action": "lambda:InvokeFunction",
+            "FunctionName": {
+              "Fn::GetAtt": ["LambdaFunction", "Arn"]
+            },
+            "Principal": "apigateway.amazonaws.com",
+            "SourceArn": {
+              "Fn::Join": ["", ["arn:aws:execute-api:", {
+                "Ref": "AWS::Region"
+              }, ":", {
+                "Ref": "AWS::AccountId"
+              }, ":", {
+                "Ref": "ApiGatewayApi"
+              }, "/*/*"]]
+            }
+          }
+        },
+    
+        "LambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": {
+                "Ref": "s3BucketName"
+              },
+              "S3Key": {
+                "Ref": "LambdaFunctionS3Key"
+              }
+            },
+            "FunctionName": "YOUR_LAMBDA_FUNCTION_NAME",
+            "Handler": "lambda.handlerFunction",
+            "Description": "Api running on api-gateway",
+            "MemorySize": 128,
+            "Role": {
+              "Fn::Join": ["", ["arn:aws:iam::", {
+                "Ref": "AWS::AccountId"
+              }, ":role/test-iam-role"]]
+            },
+            "Runtime": "nodejs4.3",
+            "Timeout": 60
+          }
+        }
+      },
+    
+      "Outputs": {
+        "LambdaFunctionConsoleUrl": {
+          "Description": "Console URL for the Lambda Function.",
+          "Value": {
+            "Fn::Join": ["", ["https://", {
+              "Ref": "AWS::Region"
+            }, ".console.aws.amazon.com/lambda/home?region=", {
+              "Ref": "AWS::Region"
+            }, "#/functions/", {
+              "Ref": "LambdaFunction"
+            }]]
+          }
+        },
+        "ApiGatewayApiConsoleUrl": {
+          "Description": "Console URL for the API Gateway API's Stage.",
+          "Value": {
+            "Fn::Join": ["", ["https://", {
+              "Ref": "AWS::Region"
+            }, ".console.aws.amazon.com/apigateway/home?region=", {
+              "Ref": "AWS::Region"
+            }, "#/apis/", {
+              "Ref": "ApiGatewayApi"
+            }, "/stages/YOUR_API_GATEWAY_STAGE"]]
+          }
+        }
+      }
+    }
+```
+
+**NOTE:** If you're linking resources from various projects, these would be accessed in the *Outputs* property.
+
+This file is creating an API on `api-gateway` (*ApiGatewayApi* resource), defining the `lambda` function (*LambdaFunction* resource) it will use and setting the permissions (*LambdaApiGatewayExecutionPermission* resource) to run the `lambda` function.
+Pretty straight forward. Compare the build time and effort it would take to build it manually, one resource at a time!
+
+More on Cloudformation [here](https://aws.amazon.com/cloudformation/). Resource types [here](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html).
