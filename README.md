@@ -1,10 +1,10 @@
 # learn-shopify-integration
 
-##Shopify Ecommerce Integration with Express.js, AWS API-Gateway, Cloudformation and mySQL
+## Shopify Ecommerce Integration with Express.js, AWS API-Gateway, Cloudformation and mySQL
 
 #### Breakdown of the project
 
-- The `Express.js` app will contain a login page (using oauth2) and a import form for the `Shopify` shop details.
+- The `Express.js` app will contain a login page (using oauth2) and an import form for the `Shopify` shop details.
 This form will require the name of the `Shopify` shop.
 Once the user has submitted this information, the app will then log-in to `Shopify` and store the returned credentials for later use.
 - `Webhooks` will be generated to automate any product updates, deletions, creations or app removals.
@@ -332,3 +332,18 @@ This file is creating an API on `api-gateway` (*ApiGatewayApi* resource), defini
 Pretty straight forward. Compare the build time and effort it would take to build it manually, one resource at a time!
 
 More on Cloudformation [here](https://aws.amazon.com/cloudformation/). Resource types [here](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html).
+
+**What resources will we need to add to `cloudformation` for our project?**
+
+1. Our `API` description on `api-gateway`
+2. The `lambda` function `api-gateway` will use
+3. `RDS` instance for our mySQL database and tables (for simplicity reasons will be public facing, but should be set-up behind a `VPC`(Virtual Private Cloud) and cut-off from internet access)
+
+
+The `S3 bucket` to store our code and allow `cloudformation` to access it will be created manually. You can create `S3 buckets` using cloudformation,
+but they would be empty when you run the `create-stack` command for `cloudformation`.
+
+We will use the build power of our `package.json` file to run the whole set of commands. Learning to leverage to power of `package.json` is useful.
+
+
+#### Leveraging package.json
