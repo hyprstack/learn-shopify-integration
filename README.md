@@ -1,10 +1,10 @@
 # learn-shopify-integration
 
-##Shopify Ecommerce Integration with Express.js, AWS API-Gateway, Cloudformation and mySQL
+## Shopify Ecommerce Integration with Express.js, AWS API-Gateway, Cloudformation and mySQL
 
 #### Breakdown of the project
 
-- The `Express.js` app will contain a login page (using oauth2) and a import form for the `Shopify` shop details.
+- The `Express.js` app will contain a login page (using oauth2) and an import form for the `Shopify` shop details.
 This form will require the name of the `Shopify` shop.
 Once the user has submitted this information, the app will then log-in to `Shopify` and store the returned credentials for later use.
 - `Webhooks` will be generated to automate any product updates, deletions, creations or app removals.
@@ -35,7 +35,7 @@ To use the best of both worlds we will require a simple configuration file which
 proxy path on api-gateway. This is a sorts of wild card for paths, allowing you to pass in any request object to your app 
 on the backend and dealing with it there.
 
-
+*api-gateway.yaml*
 ```yaml
     ---
     swagger: 2.0
@@ -142,8 +142,9 @@ on the backend and dealing with it there.
 
 As you can see there are properties in the file which contain placeholders. I have done this purposefully to allow you to re-use this file for multiple
 projects, however feel free to hard-code the values if you know you will only use it once. By running a simple node script replacing those values with your desired ones.
-Such a script could look like this
+Such a script could look like this:
 
+*configure.js*
 ```javascript
     #!/usr/bin/env node
     'use strict';
@@ -202,6 +203,7 @@ For more on [api-gateway](https://aws.amazon.com/api-gateway/)!
  
  Take this file as an example:
  
+*cloudforamtion.json* 
  ```javascript
     {
       "AWSTemplateFormatVersion": "2010-09-09",
@@ -332,3 +334,127 @@ This file is creating an API on `api-gateway` (*ApiGatewayApi* resource), defini
 Pretty straight forward. Compare the build time and effort it would take to build it manually, one resource at a time!
 
 More on Cloudformation [here](https://aws.amazon.com/cloudformation/). Resource types [here](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html).
+
+**What resources will we need to add to `cloudformation` for our project?**
+
+1. Our `API` description on `api-gateway`
+2. The `lambda` function `api-gateway` will use
+3. `RDS` instance for our mySQL database and tables (for simplicity reasons will be public facing, but should be set-up behind a `VPC`(Virtual Private Cloud) and cut-off from internet access)
+
+
+The `S3 bucket` to store our code and allow `cloudformation` to access it will be created manually. You can create `S3 buckets` using cloudformation,
+but they would be empty when you run the `create-stack` command for `cloudformation`.
+
+We will use the build power of our `package.json` file to run the whole set of commands. Learning to leverage to power of `package.json` is useful.
+
+
+#### Leveraging package.json
+
+`npm` and `package.json` are powerful and awesome tools to use in any build process. A lot of people resort to the likes of `grunt` because they think
+they need it to accomplish things they did not know were possible with `npm`. My main gripe with grunt, although I have used it a lot in the past,
+ was the poor and at times complicated documentation in their third party modules. Also it is another layer of complexity and just something else you need
+ to maintain and keep up to date. Since I started using `npm` in conjunction with the odd `node` script I have managed to rid my build processes of 
+ `grunt` altogether.
+ 
+A useful resource on how to use `npm` and `package.json` as a build tool can be found [here](https://www.keithcirkel.co.uk/how-to-use-npm-as-a-build-tool/).
+
+Particular properties to look out for when using `package.json` are the *config* and *scripts* properties.
+*config* lets you set parameters accessible from the *scripts* property and the various commands you can define there.
+*scripts* lets you run command line commands to passing variables from the *config* property. You access these values with `$npm_package_config_<paramName>`
+
+A fairly simple example is as follows:
+
+*package.json*
+```javascript
+    {
+      "name": "test-project",
+      "version": "1.0.0",
+      "description": "Project to import products from Shopify",
+      "main": "lambda.js",
+      "config": {
+        "region": "YOUR_AWS_REGION",
+        "s3BucketName": "YOUR_UNIQUE_BUCKET_NAME",
+        "cloudFormationStackName": "test-stack",
+        "dbzone": "YOUR_UNIQUE_DB_ZONE",
+        "dbInstanceClass": "YOUR_UNIQUE_INSTANCE",
+        "dbName": "YOUR_UNIQUE_DB_NAME",
+        "masterDbUser": "YOUR_UNIQUE_USER_NAME",
+        "masterDbPass": "YOUR_UNIQUE_PASS",
+        "dbVpcGroups": "YOUR_UNIQUE_VPC"
+      },
+      "scripts": {
+        "config": "node configure.js",
+        "create-bucket": "aws s3 mb s3://$npm_package_config_s3BucketName --region $npm_package_config_region",
+        "package-function": "zip -q -r lambda-function.zip lib/ node_modules/ lambda.js config.json",
+        "upload-function": "aws s3 cp ./lambda-function.zip s3://$npm_package_config_s3BucketName --region $npm_package_config_region",
+        "create-stack": "aws cloudformation create-stack --stack-name $npm_package_config_cloudFormationStackName --template-body file://./cloudformation.json --capabilities CAPABILITY_IAM --parameters ParameterKey=HevnlifyCommonBucket,ParameterValue=$npm_package_config_s3BucketName ParameterKey=MSQLAvailabilityZone,ParameterValue=$npm_package_config_dbzone ParameterKey=MSQLDBInstanceClass,ParameterValue=$npm_package_config_dbInstanceClass ParameterKey=MSQLDBName,ParameterValue=$npm_package_config_dbName ParameterKey=MSQLMasterName,ParameterValue=$npm_package_config_masterDbUser ParameterKey=MSQLMasterPassword,ParameterValue=$npm_package_config_masterDbPass ParameterKey=MSQLVCPSecurityGroups,ParameterValue=$npm_package_config_dbVpcGroups --region $npm_package_config_region",
+        "update-stack": "aws cloudformation update-stack --stack-name $npm_package_config_cloudFormationStackName --template-body file://./cloudformation.json --capabilities CAPABILITY_IAM --parameters ParameterKey=HevnlifyCommonBucket,ParameterValue=$npm_package_config_s3BucketName ParameterKey=MSQLAvailabilityZone,ParameterValue=$npm_package_config_dbzone ParameterKey=MSQLDBInstanceClass,ParameterValue=$npm_package_config_dbInstanceClass ParameterKey=MSQLDBName,ParameterValue=$npm_package_config_dbName ParameterKey=MSQLMasterName,ParameterValue=$npm_package_config_masterDbUser ParameterKey=MSQLMasterPassword,ParameterValue=$npm_package_config_masterDbPass ParameterKey=MSQLVCPSecurityGroups,ParameterValue=$npm_package_config_dbVpcGroups --region $npm_package_config_region",
+        "delete-stack": "aws cloudformation delete-stack --stack-name $npm_package_config_cloudFormationStackName --region $npm_package_config_region",
+        "package-upload-function": "npm run package-function && npm run upload-function",
+        "upload-update-function": "npm run upload-function && npm run update-function",
+        "package-upload-update-function": "npm run package-upload-function && npm run update-function",
+        "set-up-dynamo-tables": "",
+        "setup": "npm install && (aws s3api get-bucket-location --bucket $npm_package_config_s3BucketName --region $npm_package_config_region || npm run create-bucket) && (npm run package-upload-update-function || npm run package-upload-function) && (npm run update-stack || npm run create-stack || echo 'Nothing to update on Cloudformation stack')"
+      },
+      "repository": {
+        "type": "git",
+        "url": "<gitHubUrl>"
+      },
+      "author": "Mario Mendes",
+      "license": "ISC",
+      "dependencies": {}
+    }
+```
+
+And you could change *configure.js* to manipulate the `package.json` file to replace all the placeholders, such as:
+
+```javascript
+    #!/usr/bin/env node
+    'use strict';
+    const fs = require('fs');
+    const args = process.argv.slice(2);
+    const accountId = args[0];
+    const bucketName = args[1];
+    const region = args[2] || 'us-east-1';
+    const availableRegions = ['us-east-1', 'us-west-2', 'eu-west-1', 'eu-central-1', 'ap-northeast-1', 'ap-northeast-2', 'ap-southeast-1', 'ap-southeast-2'];
+    const dbzone = args[3];
+    const dbinstance = args[4];
+    const dbname = args[5];
+    const username = args[6];
+    const pass = args[7];
+    const vpc = args[8];
+    
+    if (!accountId || accountId.length !== 12) {
+      console.error('You must supply a 12 digit account id as the first argument');
+      return;
+    }
+    
+    if (!bucketName) {
+      console.error('You must supply a bucket name as the second argument');
+      return;
+    }
+    
+    if (availableRegions.indexOf(region) === -1) {
+      console.error(`Amazon API Gateway and Lambda are not available in the ${region} region. Available regions: us-east-1, us-west-2, eu-west-1, eu-central-1, ap-northeast-1, ap-northeast-2, ap-southeast-1, ap-southeast-2`);
+      return;
+    }
+    
+    modifyPackageFile();
+    // modifyCloudformationFile();
+    
+    function modifyPackageFile() {
+      const packageJsonPath = './package.json';
+      const packageJson = fs.readFileSync(packageJsonPath, 'utf8');
+      const packageJsonModified = packageJson
+        .replace(/YOUR_UNIQUE_BUCKET_NAME/g, bucketName)
+        .replace(/YOUR_AWS_REGION/g, region)
+        .replace(/YOUR_UNIQUE_DB_ZONE/g, dbzone)
+        .replace(/YOUR_UNIQUE_INSTANCE/g, dbinstance)
+        .replace(/YOUR_UNIQUE_DB_NAME/g, dbname)
+        .replace(/YOUR_UNIQUE_USER_NAME/g, username)
+        .replace(/YOUR_UNIQUE_PASS/g, pass)
+        .replace(/YOUR_UNIQUE_VPC/g, vpc);
+    
+      fs.writeFileSync(packageJsonPath, packageJsonModified, 'utf8');
+    }
+```
