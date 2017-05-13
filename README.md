@@ -458,3 +458,139 @@ And you could change *configure.js* to manipulate the `package.json` file to rep
       fs.writeFileSync(packageJsonPath, packageJsonModified, 'utf8');
     }
 ```
+
+There are two more configuration files I find pretty useful for the integration tool, especially because, one, we will be using `nconf` an npm module
+which allows you to define configuration properties in an hierarchical fashion and our own module which allows us to pass named command line parameter
+when running the script, `write-config.js`.
+
+#### nconf
+
+I have used this module in most of the projects I have written. It is highly useful and allows you to set configuration object for different build platforms
+for example and in hierarchical order.
+
+Lets take the following file as our working example.
+
+*nconfig.js*
+```javascript
+    'use strict';
+    
+    var nconf = require('nconf');
+    // This is the order of preference
+    
+    // 2. `process.env`
+    // 3. `process.argv`
+    nconf.env().argv();
+    
+    // Values in `config.json`
+    nconf.file('./config.json');
+    
+    //Any default values
+    nconf.defaults({
+      'AWS_REGION': 'eu-west-1',
+      'BASE_URL': 'http://localhost:3000',
+      'COOKIE_PARSER_SECRET': 'mysuperawesometestlongsecret44',
+      'SESSION_COOKIE': 'dev_session',
+      'OAUTH2_SERVER_CLIENT_ID': '',
+      'OAUTH2_SERVER_CLIENT_SECRET': '',
+      'SHOPIFY_CLIENT_ID': '',
+      'SHOPIFY_CLIENT_SECRET': '',
+      'SHOPIFY_REDIRECT_URL': '/handle-o-auth-response',
+      'SHOPIFY_WEBHOOK_UNINSTALL_URL': '/shopify-app-uninstall',
+      'TABLE_PREFIX': 'dev',
+      'STORAGE_SERVICE': 'mysql',
+      'QUEUE_SERVICE': 'aws-sqs',
+      'NOTIFICATION_SERVICE': 'aws-sns',
+      "STORAGE_CONFIG": {
+          "host"     : "localhost",
+          "user"     : "root",
+          "password" : "555everythingis555",
+          "name" : "learn_shopify_test",
+          "charset"  : "utf8"
+        }
+    });
+    
+    module.exports = nconf;
+```
+
+Breaking down the file, we have set our default values that we will need to authenticate with other services like AWS and mySQL. If we create a file in the
+root directory named `config.json` that file will override any default values that you define in the json file. If you define `process.argv` when you run
+ the application these value will take precedence over the json file and last `process.env` will take precedence over all other defined values.
+ 
+ Using `nconf` if in its most basic form, which is fetching the values set in our config file from withing our code, requires that you import your `nconfig.js` into your module
+ and then use the `get` method to retrieve its value.
+ 
+```javascript
+    var config = require('./path/to/nconfig');
+    var myAwsRegion = config.get('AWS_REGION'); // 'eu-west-1'
+```
+
+You can also set values by using the `set` method.
+
+That's all great, but what if you have for example various build environments?
+You need a specific configuration file.
+
+I have found the following useful:
+
+*write-config.js*
+```javascript
+    /**
+     * Created by mario (https://github.com/hyprstack) on 11/10/2016.
+     */
+    'use strict';
+    
+    var fs = require('fs');
+    
+    function objectifyCommandLineArgs(array) {
+      //remove the first 2 elements from the array
+      array.splice(0, 2);
+      // loop through array and form objects
+      var i,
+        length = array.length,
+        finalObj = {};
+    
+        for(i=0; i < length; i++) {
+          var splitStringArray = array[i].split(':');
+          // if split string has length greater than 2 we need to join the indexes from 2 forwards
+          if (splitStringArray.length > 2) {
+            //join items from index 2 forward
+            var arrayFrom2 = splitStringArray.splice(1);
+            var completeString = arrayFrom2.join(':');
+            splitStringArray.push(completeString);
+          }
+          finalObj[splitStringArray[0]] = splitStringArray[1];
+        }
+        return finalObj;
+    }
+    (function() {
+      var objOfArgs = objectifyCommandLineArgs(process.argv);
+    
+      var jsonParams = {
+        "AWS_REGION": objOfArgs.awsRegion,
+        "OAUTH2_SERVER_CLIENT_ID": objOfArgs.oauthServerClientId,
+        "OAUTH2_SERVER_CLIENT_SECRET": objOfArgs.oauthServerClientSecret,
+        "SHOPIFY_CLIENT_ID": objOfArgs.shopifyClientId,
+        "SHOPIFY_CLIENT_SECRET": objOfArgs.shopifyClientSecret,
+        "TABLE_PREFIX": objOfArgs.tablePrefix,
+        "SESSION_COOKIE": objOfArgs.SCookieName
+      };
+    
+      jsonParams = JSON.stringify(jsonParams);
+    
+      fs.writeFile('config.json', jsonParams, function (err) {
+        if (err) {
+          console.log(err);
+          process.exit(1);
+        }
+        console.log('Written config.json');
+        process.exit(0);
+      })
+    }());
+```
+
+You would use the script by running:
+
+`node write-config.js <property_name>:<property_value>`
+
+So
+
+`node write-config.js awsRegion:us-west-1 oauthServerClientId:12345 oauthServerClientSecret:678900 shopifyClientId:shopifyId shopifyClientId:sfdsfsdf tablePrefix:live SCookieName:live_cookie`
