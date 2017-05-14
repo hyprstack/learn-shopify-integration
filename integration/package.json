@@ -1,0 +1,24 @@
+{
+  "name": "learn-shopify-integration",
+  "version": "1.0.0",
+  "description": "A complete guide to build an app that integrates with shopify.",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyprstack/learn-shopify-integration.git"
+  },
+  "author": "{name: \"Mario Mendes\", email: \"mario.c.mendes195@gmail.com, github: \"https://github.com/hyprstack\"}",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hyprstack/learn-shopify-integration/issues"
+  },
+  "homepage": "https://github.com/hyprstack/learn-shopify-integration#readme",
+  "dependencies": {
+    "async": "^2.4.0",
+    "mysql": "^2.13.0",
+    "nconf": "^0.8.4"
+  }
+}
