@@ -7,7 +7,6 @@ const config = require('./../../config/configs');
 const mysql = require('mysql');
 const dbConfigs = config.get('STORAGE_CONFIG');
 const queries = require('./queries');
-const winston = require('winston');
 const dbConfig = {
   host     : dbConfigs.host,
   user     : dbConfigs.user,
@@ -113,7 +112,7 @@ mySqlManager.updateSessionObject = function(sessionId, sessionObj, callback) {
       });
     }
     //saves new session id
-    winston.info('Saving new sessionId');
+    console.log('Saving new sessionId');
     connection.query(qS, params, function(err, results, fields) {
       if (err) {
         return callback(err);
@@ -129,10 +128,10 @@ mySqlManager.updateSessionObject = function(sessionId, sessionObj, callback) {
     });
   });
 };
-
-mySqlManager.deleteExpiredSession = function(params, callback) {
-  var qStr = queries.deleteExpiredSession();
-  connection.query(qStr, params, callback);
-};
+//
+// mySqlManager.deleteExpiredSession = function(params, callback) {
+//   var qStr = queries.deleteExpiredSession();
+//   connection.query(qStr, params, callback);
+// };
 
 module.exports = mySqlManager;

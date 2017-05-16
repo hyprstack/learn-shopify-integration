@@ -18,6 +18,7 @@
   "homepage": "https://github.com/hyprstack/learn-shopify-integration#readme",
   "dependencies": {
     "async": "^2.4.0",
+    "express": "^4.15.2",
     "mysql": "^2.13.0",
     "nconf": "^0.8.4"
   }
