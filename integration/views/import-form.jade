@@ -1,0 +1,22 @@
+//
+   Created by mario on 01/04/2016.
+extend layout
+block content
+    - var errorMessage, userName, baseUri
+    h2.text-center import shop items
+
+    form(class='shopify-import-form', method='post', action=baseUri)
+        if userName
+            div(class='form-group')
+                label(for='username-filed') username
+                .input-group
+                    input#username-filed(class='form-control', type='text', value=userName, disabled)
+        div(class='form-group')
+            label(for='shop-name-filed') shopify shop
+            .input-group
+                input#shop-name-filed(class='form-control', type='text', name='shop_name', required='required', placeholder='shopify shop name')
+                .input-group-addon .my-shopify.com
+        input#submit-button(class='btn btn-default btn-xs btn-block', type='submit', value='Import Items')
+    #error-message-container
+        if errorMessage
+            p.error-messages= errorMessage

@@ -1,0 +1,19 @@
+html, body, body:before, body:after, body *, body *:before, body *:after {
+    box-sizing: border-box;
+}
+
+body {
+    background: #fafafa;
+}
+
+div.container {
+    max-width: 550px;
+}
+
+input[type=submit], input[type=submit]:hover, input[type=submit]:focus {
+    background: #57a7c9;
+}
+
+.error-messages {
+    color: orangered;
+}
