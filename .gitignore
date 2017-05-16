@@ -38,6 +38,6 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
-node_modules
+integration/node_modules
 .idea
-config.json
+integration/config.json

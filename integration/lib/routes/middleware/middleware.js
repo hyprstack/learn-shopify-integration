@@ -6,30 +6,10 @@
 
 const configs =           require('./../../config/configs');
 const userSession =       require('./../../factories/database-selector').select(configs.get('SESSION_STORAGE'));
-const sessionCookie =     require('./../../utils/session-cookie');
-const statusCode =        require('./../../utils/status-code-checker');
-const sessionCookieName = configs.get('HEVNLYWOO_SESSION_COOKIE');
-
-const middleWare = {};
 
 // Manage Connections - **START***STOP**
 
-middleWare.startConnection = function (req, res, next) {
-  userSession.initializeConnection(function(err) {
-    if (err) {
-      return next(err);
-    }
-    next();
-  });
+module.exports = {
+  initializeConnection: userSession.initializeConnection, // start connection with database
+  closeConnection:      userSession.closeConnection      // close connection with database
 };
-
-middleWare.closeConnection = function (req, res, next) {
-  userSession.closeConnection(function(err) {
-    if (err) {
-      return next(err);
-    }
-    next();
-  });
-};
-
-module.exports = middleWare;

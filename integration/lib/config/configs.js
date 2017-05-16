@@ -29,13 +29,16 @@ nconf.defaults({
   'STORAGE_SERVICE': 'mysql',
   'QUEUE_SERVICE': 'aws-sqs',
   'NOTIFICATION_SERVICE': 'aws-sns',
-  "STORAGE_CONFIG": {
-    "host"     : "localhost",
-    "user"     : "root",
-    "password" : "555everythingis555",
-    "name" : "learn_shopify_test",
-    "charset"  : "utf8"
-  }
+  "STORAGE_CONFIG": {}
 });
+
+// STORAGE_CONFIG should contain
+/*
+ "host"     : "localhost",
+ "user"     : "yourusername",
+ "password" : "yourpassword",
+ "name" : "thenameofyourdatabase",
+ "charset"  : "utf8"
+ */
 
 module.exports = nconf;
