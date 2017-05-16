@@ -64,7 +64,7 @@ function buildTables() {
       initApi(next);
     },
     function (next) {
-      console.log('CREATED USER_SESSION TABLE');
+      console.log('CREATING USER_SESSION TABLE');
       createTable(connectionApi, qStrings.createUserSessionTable, next);
     },
     function(next) {
