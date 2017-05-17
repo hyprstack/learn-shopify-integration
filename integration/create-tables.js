@@ -17,11 +17,31 @@ var confApi = {
 var connectionApi;
 
 const qStrings = {
-  createUserSessionTable: "CREATE TABLE `" + prefix + "-user-session` (" +
-  "`session_id` varchar(40) DEFAULT '', " +
-  "`session_object` varchar(264), " +
-  "PRIMARY KEY (`session_id`) " +
-  ") ENGINE=InnoDB DEFAULT CHARSET=utf8"
+  createUserTable: "CREATE TABLE `" + prefix + "-users` (" +
+  "`id` int(24) NOT NULL AUTO_INCREMENT, " +
+  "`username` varchar(64), " +
+  "`password` varchar(64), " +
+  "PRIMARY KEY (`id`), " +
+  "KEY `username` (`username`) " +
+  ") ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8",
+  createOauthClientsTable: "CREATE TABLE `" + prefix + "-oauth-clients` (" +
+  "`client_id` varchar(64) DEFAULT '', " +
+  "`client_secret` varchar(82), " +
+  "`redirect_uri` varchar(264), " +
+  "PRIMARY KEY (`client_id`), " +
+  "KEY `client_secret` (`client_secret`) " +
+  ") ENGINE=InnoDB DEFAULT CHARSET=utf8",
+  createOauthTokensTable: "CREATE TABLE `" + prefix + "-oauth-token` (" +
+  "`id` int(24) NOT NULL AUTO_INCREMENT, " +
+  "`access_token` varchar(82), " +
+  "`access_token_expires_on` datetime DEFAULT NULL, " +
+  "`client_id` varchar(64), " +
+  "`refresh_token` varchar(82), " +
+  "`refresh_token_expires_on` datetime DEFAULT NULL, " +
+  "`user_id` int(24), " +
+  "PRIMARY KEY (`id`), " +
+  "CONSTRAINT `user_id_token_fk` FOREIGN KEY (`user_id`) REFERENCES `" + prefix + "-users` (`id`) " +
+  ") ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8"
 };
 
 function initApi(callback) {
@@ -65,7 +85,15 @@ function buildTables() {
     },
     function (next) {
       console.log('CREATING USER_SESSION TABLE');
-      createTable(connectionApi, qStrings.createUserSessionTable, next);
+      createTable(connectionApi, qStrings.createUserTable, next);
+    },
+    function (next) {
+      console.log('CREATING OAUTH_CLIENTS TABLE');
+      createTable(connectionApi, qStrings.createOauthClientsTable, next);
+    },
+    function (next) {
+      console.log('CREATING OAUTH_TOKENS TABLE');
+      createTable(connectionApi, qStrings.createOauthTokensTable, next);
     },
     function(next) {
       closeApiConnection(next);
