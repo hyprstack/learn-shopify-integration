@@ -1,0 +1,19 @@
+extend layout
+block content
+    - var errorMessage, baseUri
+    h2.text-center Log-in
+
+    form(class='log-in-form', method='post', action=baseUri)
+        div(class='form-group')
+            label(for='username-filed') username
+            .input-group
+                input#username-filed(class='form-control', type='text', name='username', required='required', placeholder='username')
+        div(class='form-group')
+            label(for='password-filed') password
+            .input-group
+                input#password-filed(class='form-control', type='text', name='password', required='required', placeholder='password')
+        input#submit-button(class='btn btn-default btn-xs btn-block', type='submit', value='Log-in')
+        input#submit-button(class='btn btn-default btn-xs btn-block', type='submit', value='Register')
+    #error-message-container
+        if errorMessage
+            p.error-messages= errorMessage

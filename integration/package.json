@@ -18,12 +18,17 @@
   "homepage": "https://github.com/hyprstack/learn-shopify-integration#readme",
   "dependencies": {
     "async": "^2.4.0",
+    "aws-sdk": "^2.52.0",
+    "aws-serverless-express": "^3.0.0",
     "body-parser": "^1.17.1",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.3",
     "express": "^4.15.2",
+    "express-session": "^1.15.2",
+    "jade": "^1.11.0",
     "mysql": "^2.13.0",
     "nconf": "^0.8.4",
-    "oauth2-server": "^2.4.1"
+    "oauth2-server": "^2.4.1",
+    "shopify-node": "^0.2.4"
   }
 }

@@ -23,4 +23,8 @@ router.get('/monitor-health', function(req, res) {
   res.end();
 });
 
+router.get('/login', function(req, res) {
+  res.render('login-form');
+});
+
 module.exports = router;
