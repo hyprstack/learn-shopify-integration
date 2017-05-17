@@ -8,6 +8,7 @@ const router =       express.Router();
 const configs =      require('./../config/configs');
 const middleware =   require('./middleware/middleware');
 const bodyParser =   require('body-parser');
+const oauthServer =  require('oauth2-server');
 
 const useBodyParserJson = bodyParser.json({
   verify: function (req, res, buf, encoding) {
