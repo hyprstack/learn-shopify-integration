@@ -107,6 +107,19 @@ mySqlManager.getUser = function(username, password, callback) {
   });
 };
 
+mySqlManager.saveAccessToken = function(token, client, user, callback) {
+  var qS = queries.saveAccessToken();
+  connection.query(qS, [token.accessToken, token.accessTokenExpiresOn, client.id, token.refreshToken, token.refreshTokenExpiresOn, user.id], function(err, results, fields) {
+    if (err) {
+      return callback(err, null);
+    }
+    if (!results.length) {
+      return callback(null, false);
+    }
+    callback(null, results[0]);
+  });
+};
+
 // BRAND ID
 
 // mySqlManager.getBrandId = function(shopName, callback) {

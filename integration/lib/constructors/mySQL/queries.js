@@ -46,4 +46,8 @@ queryStrings.getUser = function () {
   return "SELECT id FROM `" + prefix + "-users` WHERE username=? AND password=? AS solution"
 };
 
+queryStrings.saveAccessToken = function () {
+  return "INSERT INTO `" + prefix + "-oauth_tokens` (access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id) VALUES (?,?,?,?,?,?)"
+};
+
 module.exports = queryStrings;
