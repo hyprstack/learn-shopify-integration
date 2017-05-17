@@ -34,4 +34,16 @@ queryStrings.deleteExpiredSession = function () {
   return "DELETE FROM `" + prefix + "-user-session` WHERE session_object.expires < ?";
 };
 
+queryStrings.getAccesToken = function () {
+  return "SELECT access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id FROM `" + prefix + "-oauth-tokens` WHERE access_token=? AS solution"
+};
+
+queryStrings.getClient = function () {
+  return "SELECT client_id, client_secret, redirect_uri FROM `" + prefix + "-oauth-clients` WHERE client_id=? AND client_secret=? AS solution"
+};
+
+queryStrings.getUser = function () {
+  return "SELECT id FROM `" + prefix + "-users` WHERE username=? AND password=? AS solution"
+};
+
 module.exports = queryStrings;

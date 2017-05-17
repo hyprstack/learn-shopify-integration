@@ -48,6 +48,65 @@ mySqlManager.closeConnection = function(req, res, callback) {
   });
 };
 
+// AUTHENTICATION
+
+// The access token retrieved form storage or falsey to indicate invalid access token
+mySqlManager.getAccessToken = function(bearerToken, callback) {
+  var qS = queries.getAccesToken();
+  connection.query(qS, [bearerToken], function(err, results, fields) {
+    if (err) {
+      return callback(err, null);
+    }
+    var tokenObj = results[0].solution;
+    if (!tokenObj) {
+      return callback(null, false);
+    }
+    var expObj = {
+      accessToken: tokenObj.access_token,
+      clientId: tokenObj.client_id,
+      expires: tokenObj.expires,
+      userId: tokenObj.userId
+    };
+    callback(null, expObj);
+  });
+};
+
+mySqlManager.getClient = function(clientId, clientSecret, callback) {
+  var qS = queries.getClient();
+  connection.query(qS, [clientId, clientSecret], function(err, results, fields) {
+    if (err) {
+      return callback(err, null);
+    }
+    var clientObj = results[0].solution;
+    if (!clientObj) {
+      return (callback(null, false));
+    }
+    var expObj = {
+      clientId: clientObj.client_id,
+      clientSecret: clientObj.client_secret,
+      redirectUri: clientObj.redirect_uri
+    };
+    callback(null, expObj);
+  });
+};
+
+mySqlManager.getUser = function(username, password, callback) {
+  var qS = queries.getUser();
+  connection.query(qS, [username, password], function(err, results, fields) {
+    if (err) {
+      return callback(err, null);
+    }
+    var userObj = results[0].solution;
+    if (!userObj) {
+      return (callback(null, false));
+    }
+    var expObj = {
+      id: userObj.id
+    };
+    callback(null, expObj);
+  });
+};
+
 // BRAND ID
 
 // mySqlManager.getBrandId = function(shopName, callback) {
