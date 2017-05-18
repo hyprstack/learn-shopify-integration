@@ -29,7 +29,8 @@ nconf.defaults({
   'STORAGE_SERVICE': 'mysql',
   'QUEUE_SERVICE': 'aws-sqs',
   'NOTIFICATION_SERVICE': 'aws-sns',
-  "STORAGE_CONFIG": {}
+  "STORAGE_CONFIG": {},
+  "GRANT_LIST": ['password']
 });
 
 // STORAGE_CONFIG should contain
