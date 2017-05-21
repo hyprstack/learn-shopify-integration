@@ -10,6 +10,7 @@ const middleware =   require('./middleware/middleware');
 const bodyParser =   require('body-parser');
 const oauthServer =  require('oauth2-server');
 const util =         require('util');
+const baseUrl =      configs.get('BASE_URL');
 
 const useBodyParserJson = bodyParser.json({
   verify: function (req, res, buf, encoding) {
@@ -33,11 +34,12 @@ router.get('/monitor-health', function(req, res) {
   res.end();
 });
 
+//TODO: add base url to all redirect urls (api-gateway needs this)
 // Get authorization.
 router.get('/oauth/authorize', function(req, res) {
   // Redirect anonymous users to login page.
   if (!req.app.locals.user) {
-    return res.redirect(util.format('/login?redirect=%s&client_id=%s&redirect_uri=%s', req.path, req.query.client_id, req.query.redirect_uri));
+    return res.redirect(baseUrl + util.format('/login?redirect=%s&client_id=%s&redirect_uri=%s', req.path, req.query.client_id, req.query.redirect_uri));
   }
 
   return render('authorize', {
@@ -50,7 +52,7 @@ router.get('/oauth/authorize', function(req, res) {
 router.post('/oauth/authorize', function(req, res) {
   // Redirect anonymous users to login page.
   if (!req.app.locals.user) {
-    return res.redirect(util.format('/login?client_id=%s&redirect_uri=%s', req.query.client_id, req.query.redirect_uri));
+    return res.redirect(baseUrl + util.format('/login?client_id=%s&redirect_uri=%s', req.query.client_id, req.query.redirect_uri));
   }
 
   return app.oauth.authorize();
@@ -79,7 +81,7 @@ router.post('/login', function(req, res) {
   // Successful logins should send the user back to /oauth/authorize.
   var path = req.body.redirect || '/home';
 
-  return res.redirect(util.format('/%s?client_id=%s&redirect_uri=%s', path, req.query.client_id, req.query.redirect_uri));
+  return res.redirect(baseUrl + util.format('/%s?client_id=%s&redirect_uri=%s', path, req.query.client_id, req.query.redirect_uri));
 });
 
 // Get secret.
