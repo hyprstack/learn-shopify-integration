@@ -25,8 +25,8 @@ const qStrings = {
   "KEY `username` (`username`) " +
   ") ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8",
   createOauthClientsTable: "CREATE TABLE `" + prefix + "-oauth-clients` (" +
-  "`client_id` varchar(64) DEFAULT '', " +
-  "`client_secret` varchar(82), " +
+  "`client_id` varchar(264) DEFAULT '', " +
+  "`client_secret` varchar(264), " +
   "`redirect_uri` varchar(264), " +
   "PRIMARY KEY (`client_id`), " +
   "KEY `client_secret` (`client_secret`) " +

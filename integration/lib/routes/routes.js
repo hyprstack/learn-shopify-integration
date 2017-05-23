@@ -34,7 +34,6 @@ router.get('/monitor-health', function(req, res) {
   res.end();
 });
 
-//TODO: add base url to all redirect urls (api-gateway needs this)
 // Get authorization.
 router.get('/oauth/authorize', function(req, res) {
   // Redirect anonymous users to login page.

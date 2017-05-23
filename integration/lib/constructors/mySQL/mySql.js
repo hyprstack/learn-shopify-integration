@@ -90,6 +90,16 @@ mySqlManager.getClient = function(clientId, clientSecret, callback) {
   });
 };
 
+mySqlManager.saveClient = function(clientId, clientSecret, redirectUrl, callback) {
+  var qS = queries.saveClient();
+  connection.query(qS, [clientId, clientSecret, redirectUrl] , function(err, results, fields) {
+    if (err) {
+      return callback(err, null);
+    }
+    callback(null, results[0]);
+  });
+};
+
 mySqlManager.getUser = function(username, password, callback) {
   var qS = queries.getUser();
   connection.query(qS, [username, password], function(err, results, fields) {
@@ -106,6 +116,16 @@ mySqlManager.getUser = function(username, password, callback) {
     callback(null, expObj);
   });
 };
+
+mySqlManager.saveUser = function(username, password, callback) {
+  var qS = queries.saveUser();
+  connection.query(qS, [username, password], function(err, results, fields) {
+    if (err) {
+      return callback(err, null);
+    }
+    callback(null, results[0]);
+  });
+}
 
 mySqlManager.saveAccessToken = function(token, client, user, callback) {
   var qS = queries.saveAccessToken();

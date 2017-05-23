@@ -42,8 +42,16 @@ queryStrings.getClient = function () {
   return "SELECT client_id, client_secret, redirect_uri FROM `" + prefix + "-oauth-clients` WHERE client_id=? AND client_secret=? AS solution"
 };
 
+queryStrings.saveClient = function () {
+  return "INSERT INTO `" + prefix + "-oauth-clients` (client_id, client_secret, redirect_uri) VALUES (?, ?, ?)"
+};
+
 queryStrings.getUser = function () {
   return "SELECT id FROM `" + prefix + "-users` WHERE username=? AND password=? AS solution"
+};
+
+queryStrings.saveUser = function () {
+  return "INSERT INTO `" + prefix + "-users` (username, password) VALUES (?, ?)"
 };
 
 queryStrings.saveAccessToken = function () {
