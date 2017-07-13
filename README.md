@@ -595,5 +595,3 @@ So
 
 `node write-config.js awsRegion:us-west-1 oauthServerClientId:12345 oauthServerClientSecret:678900 shopifyClientId:shopifyId shopifyClientId:sfdsfsdf tablePrefix:live SCookieName:live_cookie`
 
-
-TODO: Exchange mySQL for SQLite - no need for server based database for this example

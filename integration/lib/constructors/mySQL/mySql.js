@@ -3,10 +3,10 @@
  */
 'use strict';
 
-const config = require('./../../config/configs');
-const mysql = require('mysql');
+const config    = require('./../../config/configs');
+const mysql     = require('mysql');
 const dbConfigs = config.get('STORAGE_CONFIG');
-const queries = require('./queries');
+const queries   = require('./queries');
 // const sessionCookie = require('./../../utils/session-cookie');
 // const statusCode = require('./../../utils/status-code-checker');
 // const sessionCookieName = configs.get('HEVNLYWOO_SESSION_COOKIE');
@@ -19,15 +19,15 @@ const dbConfig = {
 };
 const mySqlManager = {};
 
-var connection = false;
+let connection = false;
 
-mySqlManager.initializeConnection = function(req, res, callback) {
+mySqlManager.initializeConnection = (req, res, callback) => {
   if (!dbConfig.host || !dbConfig.user || !dbConfig.password) {
     return false;
   }
   console.log('Mysql: connecting to ' + dbConfig.host + ':' + dbConfig.database);
   connection = mysql.createConnection(dbConfig);
-  connection.connect(function(err) {
+  connection.connect((err) => {
     if (err) {
       winston.info('Error connecting to Mysql: ' + err);
       return callback(err);
@@ -37,8 +37,8 @@ mySqlManager.initializeConnection = function(req, res, callback) {
   });
 };
 
-mySqlManager.closeConnection = function(req, res, callback) {
-  connection.end(function(err) {
+mySqlManager.closeConnection = (req, res, callback) => {
+  connection.end((err) => {
     if (err) {
       console.log('Error closing Mysql connection');
       return callback(err, null);
@@ -51,17 +51,17 @@ mySqlManager.closeConnection = function(req, res, callback) {
 // AUTHENTICATION
 
 // The access token retrieved form storage or falsey to indicate invalid access token
-mySqlManager.getAccessToken = function(bearerToken, callback) {
-  var qS = queries.getAccesToken();
-  connection.query(qS, [bearerToken], function(err, results, fields) {
+mySqlManager.getAccessToken = (bearerToken, callback) => {
+  const qS = queries.getAccesToken();
+  connection.query(qS, [bearerToken], (err, results, fields) => {
     if (err) {
       return callback(err, null);
     }
-    var tokenObj = results[0].solution;
+    const tokenObj = results[0].solution;
     if (!tokenObj) {
       return callback(null, false);
     }
-    var expObj = {
+    const expObj = {
       accessToken: tokenObj.access_token,
       clientId: tokenObj.client_id,
       expires: tokenObj.expires,
@@ -71,17 +71,17 @@ mySqlManager.getAccessToken = function(bearerToken, callback) {
   });
 };
 
-mySqlManager.getClient = function(clientId, clientSecret, callback) {
-  var qS = queries.getClient();
-  connection.query(qS, [clientId, clientSecret], function(err, results, fields) {
+mySqlManager.getClient = (clientId, clientSecret, callback) => {
+  const qS = queries.getClient();
+  connection.query(qS, [clientId, clientSecret], (err, results, fields) => {
     if (err) {
       return callback(err, null);
     }
-    var clientObj = results[0].solution;
+    const clientObj = results[0].solution;
     if (!clientObj) {
       return (callback(null, false));
     }
-    var expObj = {
+    const expObj = {
       clientId: clientObj.client_id,
       clientSecret: clientObj.client_secret,
       redirectUri: clientObj.redirect_uri
@@ -90,9 +90,9 @@ mySqlManager.getClient = function(clientId, clientSecret, callback) {
   });
 };
 
-mySqlManager.saveClient = function(clientId, clientSecret, redirectUrl, callback) {
-  var qS = queries.saveClient();
-  connection.query(qS, [clientId, clientSecret, redirectUrl] , function(err, results, fields) {
+mySqlManager.saveClient = (clientId, clientSecret, redirectUrl, callback) => {
+  const qS = queries.saveClient();
+  connection.query(qS, [clientId, clientSecret, redirectUrl] , (err, results, fields) => {
     if (err) {
       return callback(err, null);
     }
@@ -100,36 +100,36 @@ mySqlManager.saveClient = function(clientId, clientSecret, redirectUrl, callback
   });
 };
 
-mySqlManager.getUser = function(username, password, callback) {
-  var qS = queries.getUser();
-  connection.query(qS, [username, password], function(err, results, fields) {
+mySqlManager.getUser = (username, password, callback) => {
+  const qS = queries.getUser();
+  connection.query(qS, [username, password], (err, results, fields) => {
     if (err) {
       return callback(err, null);
     }
-    var userObj = results[0].solution;
+    const userObj = results[0].solution;
     if (!userObj) {
       return (callback(null, false));
     }
-    var expObj = {
+    const expObj = {
       id: userObj.id
     };
     callback(null, expObj);
   });
 };
 
-mySqlManager.saveUser = function(username, password, callback) {
-  var qS = queries.saveUser();
-  connection.query(qS, [username, password], function(err, results, fields) {
+mySqlManager.saveUser = (username, password, callback) => {
+  const qS = queries.saveUser();
+  connection.query(qS, [username, password], (err, results, fields) => {
     if (err) {
       return callback(err, null);
     }
     callback(null, results[0]);
   });
-}
+};
 
-mySqlManager.saveAccessToken = function(token, client, user, callback) {
-  var qS = queries.saveAccessToken();
-  connection.query(qS, [token.accessToken, token.accessTokenExpiresOn, client.id, token.refreshToken, token.refreshTokenExpiresOn, user.id], function(err, results, fields) {
+mySqlManager.saveAccessToken = (token, client, user, callback) => {
+  const qS = queries.saveAccessToken();
+  connection.query(qS, [token.accessToken, token.accessTokenExpiresOn, client.id, token.refreshToken, token.refreshTokenExpiresOn, user.id], (err, results, fields) => {
     if (err) {
       return callback(err, null);
     }
@@ -142,9 +142,9 @@ mySqlManager.saveAccessToken = function(token, client, user, callback) {
 
 // BRAND ID
 
-// mySqlManager.getBrandId = function(shopName, callback) {
-//   var qS = queries.getBrandId();
-//   connection.query(qS, [shopName], function(err, results, fields) {
+// mySqlManager.getBrandId = (shopName, callback) => {
+//   const qS = queries.getBrandId();
+//   connection.query(qS, [shopName], (err, results, fields) => {
 //     if (err) {
 //       return callback(err);
 //     }
@@ -155,9 +155,9 @@ mySqlManager.saveAccessToken = function(token, client, user, callback) {
 //   });
 // };
 //
-// mySqlManager.saveBrandId = function(shopName, brandId, callback) {
-//   var qStr = queries.saveBrandId();
-//   connection.query(qStr, [shopName, brandId], function(err, results, fields) {
+// mySqlManager.saveBrandId = (shopName, brandId, callback) => {
+//   const qStr = queries.saveBrandId();
+//   connection.query(qStr, [shopName, brandId], (err, results, fields) => {
 //     if (err) {
 //       return callback(err, null);
 //     }
@@ -168,9 +168,9 @@ mySqlManager.saveAccessToken = function(token, client, user, callback) {
 //
 // // USER SESSION
 //
-// mySqlManager.getSessionObject = function(sessionId, callback) {
-//   var qStr = queries.getSessionObject();
-//   connection.query(qStr, [sessionId], function(err, results, fields) {
+// mySqlManager.getSessionObject = (sessionId, callback) => {
+//   const qStr = queries.getSessionObject();
+//   connection.query(qStr, [sessionId], (err, results, fields) => {
 //     if (err) {
 //       return callback(err);
 //     }
@@ -178,9 +178,9 @@ mySqlManager.saveAccessToken = function(token, client, user, callback) {
 //   });
 // };
 //
-// mySqlManager.saveSessionId = function(sessionId, callback) {
-//   var qStr = queries.saveSessionId();
-//   connection.query(qStr, [sessionId], function(err, results, fields) {
+// mySqlManager.saveSessionId = (sessionId, callback) => {
+//   const qStr = queries.saveSessionId();
+//   connection.query(qStr, [sessionId], (err, results, fields) => {
 //     if (err) {
 //       return callback(err, null);
 //     }
@@ -188,18 +188,18 @@ mySqlManager.saveAccessToken = function(token, client, user, callback) {
 //   });
 // };
 //
-// mySqlManager.updateSessionObject = function(sessionId, sessionObj, callback) {
-//   var qStr = queries.getSessionObject();
-//   connection.query(qStr, [sessionId], function(err, results, fields) {
+// mySqlManager.updateSessionObject = (sessionId, sessionObj, callback) => {
+//   const qStr = queries.getSessionObject();
+//   connection.query(qStr, [sessionId], (err, results, fields) => {
 //     if (err) {
 //       return callback(err);
 //     }
-//     var qS = queries.saveSessionId();
-//     var params = [sessionId];
+//     let qS = queries.saveSessionId();
+//     let params = [sessionId];
 //     if (results.length) {
 //       qS = queries.updateSessionObject();
 //       params = [sessionObj, sessionId];
-//       return connection.query(qS, params, function(err, results, fields) {
+//       return connection.query(qS, params, (err, results, fields) => {
 //         if (err) {
 //           return callback(err);
 //         }
@@ -208,13 +208,13 @@ mySqlManager.saveAccessToken = function(token, client, user, callback) {
 //     }
 //     //saves new session id
 //     console.log('Saving new sessionId');
-//     connection.query(qS, params, function(err, results, fields) {
+//     connection.query(qS, params, (err, results, fields) => {
 //       if (err) {
 //         return callback(err);
 //       }
 //       qS = queries.updateSessionObject();
 //       params = [sessionObj, sessionId];
-//       return connection.query(qS, params, function(err, results, fields) {
+//       return connection.query(qS, params, (err, results, fields) => {
 //         if (err) {
 //           return callback(err);
 //         }
@@ -224,8 +224,8 @@ mySqlManager.saveAccessToken = function(token, client, user, callback) {
 //   });
 // };
 //
-// mySqlManager.deleteExpiredSession = function(params, callback) {
-//   var qStr = queries.deleteExpiredSession();
+// mySqlManager.deleteExpiredSession = (params, callback) => {
+//   const qStr = queries.deleteExpiredSession();
 //   connection.query(qStr, params, callback);
 // };
 

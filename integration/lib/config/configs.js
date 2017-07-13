@@ -38,7 +38,7 @@ nconf.defaults({
  "host"     : "localhost",
  "user"     : "yourusername",
  "password" : "yourpassword",
- "name" : "thenameofyourdatabase",
+ "name"     : "thenameofyourdatabase",
  "charset"  : "utf8"
  */
 

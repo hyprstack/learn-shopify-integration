@@ -3,10 +3,10 @@
  */
 'use strict';
 
-var app = require('./app');
+const app = require('./app');
 
-var server = app.listen(3000, function () {
-  var port = server.address().port;
+const server = app.listen(3000, () => {
+  const port = server.address().port;
   console.log('App listening on port %s', port);
 });
 

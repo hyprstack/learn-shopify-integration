@@ -3,15 +3,13 @@
  */
 'use strict';
 
-var sessionCookie = {};
+const sessionCookie = {};
 
-sessionCookie.gen = function () {
-  var date = new Date();
-
+sessionCookie.gen = () => {
+  let date = new Date();
   // Get Unix milliseconds at current time plus 1 day
   date.setTime(date.getTime() + (1 * 24 * 60 * 60 * 1000));
-  var cookieVal = Math.random().toString(36).substring(7); // Generate a random cookie string
-
+  const cookieVal = Math.random().toString(36).substring(7); // Generate a random cookie string
   return {
     cookieValue: cookieVal,
     expirationDate: date

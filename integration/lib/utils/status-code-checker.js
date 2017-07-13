@@ -3,10 +3,10 @@
  */
 'use strict';
 
-var statusCodeChecker = {};
+const statusCodeChecker = {};
 
-statusCodeChecker.checkRange = function (statusCode) {
-  var truthyCase = statusCode >= 200 && statusCode <= 299;
+statusCodeChecker.checkRange = (statusCode) => {
+  let truthyCase = statusCode >= 200 && statusCode <= 299;
   return truthyCase;
 };
 

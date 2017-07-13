@@ -3,12 +3,12 @@
  */
 'use strict';
 
-var mysql = require('./../constructors/mySQL/mySql');
+const mysql = require('./../constructors/mySQL/mySql');
 
-var db = {};
+const db = {};
 
-db.select = function (config) {
-  var service;
+db.select =  (config) => {
+  let service;
   switch(config) {
     case 'mySQL':
       service = mysql;
@@ -16,7 +16,6 @@ db.select = function (config) {
     default:
       service = mysql;
   }
-
   return service;
 };
 

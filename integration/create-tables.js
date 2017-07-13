@@ -2,19 +2,19 @@
  * Created by mario (https://github.com/hyprstack) on 14/05/2017.
  */
 'use strict';
-const mysql = require('mysql');
-const async = require('async');
-const config = require('./lib/config/configs');
-const prefix = config.get('TABLE_PREFIX');
+const mysql     = require('mysql');
+const async     = require('async');
+const config    = require('./lib/config/configs');
+const prefix    = config.get('TABLE_PREFIX');
 const dbConfigs = config.get('STORAGE_CONFIG');
-var confApi = {
+const confApi = {
   host     : dbConfigs.host,
   user     : dbConfigs.user,
   password : dbConfigs.password,
   database : dbConfigs.name,
   charset  : dbConfigs.charset
 };
-var connectionApi;
+let connectionApi;
 
 const qStrings = {
   createUserTable: "CREATE TABLE `" + prefix + "-users` (" +
