@@ -21,9 +21,13 @@ const mySqlManager = {};
 
 let connection = false;
 
-mySqlManager.initializeConnection = (req, res, callback) => {
+mySqlManager.initializeConnection = (callback) => {
   if (!dbConfig.host || !dbConfig.user || !dbConfig.password) {
     return false;
+  }
+  if (connection) {
+    console.log('******** MYSQL CONNECTION ALREADY ESTABLISHED **********');
+    return callback();
   }
   console.log('Mysql: connecting to ' + dbConfig.host + ':' + dbConfig.database);
   connection = mysql.createConnection(dbConfig);
@@ -37,7 +41,11 @@ mySqlManager.initializeConnection = (req, res, callback) => {
   });
 };
 
-mySqlManager.closeConnection = (req, res, callback) => {
+mySqlManager.closeConnection = (callback) => {
+  if (!connection) {
+    console.log('****** THERE IS NO CONNECTION TO CLOSE ******!');
+    return callback();
+  }
   connection.end((err) => {
     if (err) {
       console.log('Error closing Mysql connection');
@@ -52,7 +60,7 @@ mySqlManager.closeConnection = (req, res, callback) => {
 
 // The access token retrieved form storage or falsey to indicate invalid access token
 mySqlManager.getAccessToken = (bearerToken, callback) => {
-  const qS = queries.getAccesToken();
+  const qS = queries.getAccessToken();
   connection.query(qS, [bearerToken], (err, results, fields) => {
     if (err) {
       return callback(err, null);
@@ -103,10 +111,11 @@ mySqlManager.saveClient = (clientId, clientSecret, redirectUrl, callback) => {
 mySqlManager.getUser = (username, password, callback) => {
   const qS = queries.getUser();
   connection.query(qS, [username, password], (err, results, fields) => {
+    console.log(results);
     if (err) {
       return callback(err, null);
     }
-    const userObj = results[0].solution;
+    const userObj = results[0];
     if (!userObj) {
       return (callback(null, false));
     }

@@ -34,28 +34,28 @@ queryStrings.deleteExpiredSession = () => {
   return "DELETE FROM `" + prefix + "-user-session` WHERE session_object.expires < ?";
 };
 
-queryStrings.getAccesToken = () => {
-  return "SELECT access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id FROM `" + prefix + "-oauth-tokens` WHERE access_token=? AS solution"
+queryStrings.getAccessToken = () => {
+  return "SELECT access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id FROM `" + prefix + "-oauth-tokens` WHERE access_token=? AS solution";
 };
 
 queryStrings.getClient = () => {
-  return "SELECT client_id, client_secret, redirect_uri FROM `" + prefix + "-oauth-clients` WHERE client_id=? AND client_secret=? AS solution"
+  return "SELECT client_id, client_secret, redirect_uri FROM `" + prefix + "-oauth-clients` WHERE client_id=? AND client_secret=? AS solution";
 };
 
 queryStrings.saveClient = () => {
-  return "INSERT INTO `" + prefix + "-oauth-clients` (client_id, client_secret, redirect_uri) VALUES (?, ?, ?)"
+  return "INSERT INTO `" + prefix + "-oauth-clients` (client_id, client_secret, redirect_uri) VALUES (?, ?, ?)";
 };
 
 queryStrings.getUser = () => {
-  return "SELECT id FROM `" + prefix + "-users` WHERE username=? AND password=? AS solution"
+  return "SELECT id FROM `" + prefix + "-users` WHERE username=? AND password=?";
 };
 
 queryStrings.saveUser = () => {
-  return "INSERT INTO `" + prefix + "-users` (username, password) VALUES (?, ?)"
+  return "INSERT INTO `" + prefix + "-users` (username, password) VALUES (?, ?)";
 };
 
 queryStrings.saveAccessToken = () => {
-  return "INSERT INTO `" + prefix + "-oauth_tokens` (access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id) VALUES (?,?,?,?,?,?)"
+  return "INSERT INTO `" + prefix + "-oauth_tokens` (access_token, access_token_expires_on, client_id, refresh_token, refresh_token_expires_on, user_id) VALUES (?,?,?,?,?,?)";
 };
 
 module.exports = queryStrings;
